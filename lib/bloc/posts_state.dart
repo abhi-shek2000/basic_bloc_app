@@ -42,6 +42,7 @@ class FailedToLoadPostsState extends PostsState {
 ///
 ///
 class PostsBloc extends Bloc<PostsEvent, PostsState> {
+  /// Dataservice is to make network call and fetch data
   final _dataService = DataService();
 
   PostsBloc() : super(LoadingPostsState()) {
