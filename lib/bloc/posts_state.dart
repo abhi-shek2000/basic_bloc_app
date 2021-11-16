@@ -1,3 +1,4 @@
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_bloc_app/Network/data_service.dart';
 import 'package:flutter_bloc_app/bloc/posts_events.dart';
@@ -53,13 +54,18 @@ class PostsBloc extends Bloc<PostsEvent, PostsState> {
         emit(LoadingPostsState());
         await fetchData(emit, _dataService);
       },
+      transformer: concurrent(),
+
+      /// Transformer is used to set how events should be handled,
+      /// concurrent - process events concurrently
+      /// sequential - process events sequentially
+      /// droppable - ignore any events added while an event is processing
+      /// restartable - process only the latest event and cancel previous event handlers
     );
-    on<PullToRefreshEvent>(
-      (event, emit) async {
-        emit(LoadingPostsState());
-        await fetchData(emit, _dataService);
-      },
-    );
+    on<PullToRefreshEvent>((event, emit) async {
+      emit(LoadingPostsState());
+      await fetchData(emit, _dataService);
+    }, transformer: concurrent());
   }
 
   /// *************** Deprecated ******************
