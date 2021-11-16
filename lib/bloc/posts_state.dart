@@ -43,8 +43,28 @@ class FailedToLoadPostsState extends PostsState {
 class PostsBloc extends Bloc<PostsEvent, PostsState> {
   final _dataService = DataService();
 
-  PostsBloc() : super(LoadingPostsState());
+  PostsBloc() : super(LoadingPostsState()) {
+    /// In the new version on Bloc mapEventToState is deprecated and on<Event> function is added
+    /// here we need to map each event to its state
+    /// emit function will change the state of the page
+    ///
+    on<LoadPostsEvent>(
+      (event, emit) async {
+        emit(LoadingPostsState());
+        await fetchData(emit, _dataService);
+      },
+    );
+    on<PullToRefreshEvent>(
+      (event, emit) async {
+        emit(LoadingPostsState());
+        await fetchData(emit, _dataService);
+      },
+    );
+  }
 
+  /// *************** Deprecated ******************
+  /*
+    // PostsBloc() : super(LoadingPostsState());
   /// This is an important function, it maps in which state the app must go for each Event
   ///
   /// This function doesn't return but yeilds the state
@@ -74,5 +94,23 @@ class PostsBloc extends Bloc<PostsEvent, PostsState> {
         yield FailedToLoadPostsState(error: e as Error);
       }
     }
+  }
+  */
+}
+
+Future<void> fetchData(
+    Emitter<PostsState> emit, DataService _dataService) async {
+  try {
+    final posts = await _dataService.getPosts();
+
+    ///
+    /// If data is loaded successfully we emit loadedState
+    ///
+    emit(LoadedPostsState(posts: posts));
+  } catch (e) {
+    ///
+    /// If there is any error we emit FailureState
+    ///
+    emit(FailedToLoadPostsState(error: e as Error));
   }
 }
