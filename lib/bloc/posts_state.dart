@@ -46,7 +46,7 @@ class PostsBloc extends Bloc<PostsEvent, PostsState> {
   final _dataService = DataService();
 
   PostsBloc() : super(LoadingPostsState()) {
-    /// In the new version on Bloc mapEventToState is deprecated and on<Event> function is added
+    /// In the new version of Bloc mapEventToState is deprecated and on<Event> function is added
     /// here we need to map each event to its state
     /// emit function will change the state of the page
     ///
